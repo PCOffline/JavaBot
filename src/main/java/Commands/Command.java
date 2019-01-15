@@ -65,7 +65,6 @@ public abstract class Command {
     }
 
     public boolean validate(String message) {
-        System.out.println(Strings.prefix.getValue());
         if (this.name == null || message == null)
             return false;
         if ((!message.contains(" ")) && isParameter)

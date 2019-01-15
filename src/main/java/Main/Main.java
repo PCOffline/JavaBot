@@ -1,11 +1,13 @@
 package Main;
 
+import Exceptions.KeywordNotFoundException;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
+import java.lang.reflect.Field;
 
 /**
  * The main class, all main processes are being executed here.
@@ -38,7 +40,18 @@ public class Main extends ListenerAdapter {
         if (Memory.argumentEmpty(argument))
             Memory.addArgument(argument, value);
         else
-            Memory.editArgument(argument, value, true);
+            try {
+                Memory.editArgument(argument, value, true);
+            } catch (KeywordNotFoundException e) {
+                Memory.addArgument(argument, value);
+            }
+
+        try {
+            Field field = Strings.class.getField(argument);
+            field.set(argument, new Strings.Argument(argument, value));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
