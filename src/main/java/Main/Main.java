@@ -28,6 +28,20 @@ public class Main extends ListenerAdapter {
     }
 
     /**
+     * Updates configuration of Bot
+     *
+     * @param argument Argument to update
+     * @param value    New value
+     */
+
+    public static void updateConfig(String argument, String value) {
+        if (Memory.argumentEmpty(argument))
+            Memory.addArgument(argument, value);
+        else
+            Memory.editArgument(argument, value, true);
+    }
+
+    /**
      * Executes when a message on any guild is received
      *
      * @param event a {@link MessageReceivedEvent MessageReceivedEvent} of the message received

@@ -1,5 +1,8 @@
 package Main;
 
+import Exceptions.AlreadyExistException;
+import Exceptions.KeywordNotFoundException;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -112,7 +115,7 @@ public class Memory {
                 ++count;
             }
 
-            while (line != null && count >= limit) {
+            while (line != null) {
                 raw.append(line);
                 raw.append("\n");
                 line = reader.readLine();
@@ -169,27 +172,6 @@ public class Memory {
         }
     }
 
-    // Delete
-
-    /**
-     * Delete line of a file
-     *
-     * @param path Path of the file where the line is deleted
-     * @param line The line number to be deleted
-     */
-
-    private static void deleteLine(String path, long line) {
-        FileOutputStream outputStream;
-
-        try {
-            outputStream = new FileOutputStream(path);
-            outputStream.write((readFile(path, line - 1) + "\n" + readFile(line + 1, path)).getBytes());
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Checks if a keyword exists in a file
      *
@@ -201,7 +183,6 @@ public class Memory {
      */
 
     // Keyword
-
     private static boolean keywordExist(String path, String keyword, boolean ignoreCase, boolean keywordIsLine) {
         BufferedReader reader;
         String line;
@@ -289,17 +270,43 @@ public class Memory {
 
     /**
      * Replaces a word in a file with another word.
-     * @param path Path of the file
-     * @param prev Word to replace
-     * @param value New word
-     * @param ignoreCase Should the method ignore case
+     *
+     * @param path          Path of the file
+     * @param prev          Word to replace
+     * @param value         New word
+     * @param ignoreCase    Should the method ignore case
      * @param keywordIsLine Is the keyword an entire line or a part of a line
+     * @throws KeywordNotFoundException if the keyword does not exist
      */
 
-    private static void editKeyword (String path, String prev, String value, boolean ignoreCase, boolean keywordIsLine) {
-            long line = getLine(path, prev, ignoreCase, keywordIsLine);
-            writeFile(path, keywordIsLine ? value : goLine(path, line).replace(prev, value), line + 1);
-            deleteLine(path, line);
+    static void editKeyword(String path, String prev, String value, boolean ignoreCase, boolean keywordIsLine) throws KeywordNotFoundException {
+        if (!keywordExist(path, prev, ignoreCase, keywordIsLine))
+            throw new KeywordNotFoundException();
+
+        long line = getLine(path, prev, ignoreCase, keywordIsLine);
+        writeFile(path, keywordIsLine ? value : goLine(path, line).replace(prev, value), line + 1);
+        deleteLine(path, line);
+    }
+
+    /**
+     * Edit a keyword in a file
+     *
+     * @param path          Path of the file
+     * @param prev          Keyword to replace
+     * @param value         New value
+     * @param ignoreCase    Should the method ignore case
+     * @param keywordIsLine Is the keyword an entire line or part of a line
+     * @param start         Line to start from
+     * @throws KeywordNotFoundException If keyword does not exist
+     */
+
+    static void editKeyword(String path, String prev, String value, boolean ignoreCase, boolean keywordIsLine, long start) throws KeywordNotFoundException {
+        if (!keywordExist(path, prev, ignoreCase, keywordIsLine, start))
+            throw new KeywordNotFoundException();
+
+        long line = getLine(path, prev, ignoreCase, keywordIsLine);
+        writeFile(path, keywordIsLine ? value : goLine(path, line).replace(prev, value), line + 1);
+        deleteLine(path, line);
     }
 
     // Line
@@ -312,12 +319,16 @@ public class Memory {
      * @param ignoreCase    Should the search ignore case or not
      * @param keywordIsLine Is the keyword a whole line or a part of a line in the file
      * @return The line of the first occurrence of the keyword as a whole line or as a part of a line in the file
+     * @throws KeywordNotFoundException if the keyword does not exist
      */
 
-    private static long getLine(String path, String keyword, boolean ignoreCase, boolean keywordIsLine) throws  {
+    private static long getLine(String path, String keyword, boolean ignoreCase, boolean keywordIsLine) throws KeywordNotFoundException {
         BufferedReader reader;
         String line;
         int count = 1;
+
+        if (!keywordExist(path, keyword, ignoreCase, keywordIsLine))
+            throw new KeywordNotFoundException();
 
         try {
 
@@ -354,9 +365,13 @@ public class Memory {
      * @param keywordIsLine Is the keyword a whole line or a part of a line in the file
      * @param start         Line to start from
      * @return The line of the first occurrence of the keyword as a whole line or as a part of a line in the file
+     * @throws KeywordNotFoundException if the keyword does not exist
      */
 
-    private static long getLine(String path, String keyword, boolean ignoreCase, boolean keywordIsLine, long start) {
+    private static long getLine(String path, String keyword, boolean ignoreCase, boolean keywordIsLine, long start) throws KeywordNotFoundException {
+        if (!keywordExist(path, keyword, ignoreCase, keywordIsLine, start))
+            throw new KeywordNotFoundException();
+
         BufferedReader reader;
         String line;
         int count = 1;
@@ -392,7 +407,6 @@ public class Memory {
         }
     }
 
-
     /**
      * Returns the content of a specific line
      *
@@ -405,7 +419,39 @@ public class Memory {
         return readFile(line, path).split("\n")[0];
     }
 
+    /**
+     * Delete line of a file
+     *
+     * @param path Path of the file where the line is deleted
+     * @param line The line number to be deleted
+     */
+
+    private static void deleteLine(String path, long line) {
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = new FileOutputStream(path);
+            outputStream.write((readFile(path, line - 1) + "\n" + readFile(line + 1, path)).getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Guild
+
+    /**
+     * Add an argument to the config file
+     *
+     * @param argument Argument to add
+     * @param value    Value of the argument
+     */
+
+    static void addArgument(String argument, String value) throws AlreadyExistException {
+        if (keywordExist(Strings.CONFIG_PATH, argument + ":", true, false))
+            throw new AlreadyExistException("Cannot add already existing argument");
+        writeFile(Strings.CONFIG_PATH, argument + ": " + value);
+    }
 
     /**
      * Edit guild value
@@ -415,7 +461,7 @@ public class Memory {
      * @param ignoreCase Should the search ignore case
      */
 
-    public static void editArgument (String prev, String value, boolean ignoreCase) {
+    public static void editArgument(String prev, String value, boolean ignoreCase) {
         long line = getLine(Strings.CONFIG_PATH, prev, ignoreCase, false);
         writeFile(Strings.CONFIG_PATH, value, line + 1);
         deleteLine(Strings.CONFIG_PATH, line);
@@ -428,7 +474,7 @@ public class Memory {
      * @return True if the argument and the guild exist
      */
 
-    private static boolean argumentExist (String argument) {
+    static boolean argumentExist(String argument) {
         return keywordExist(Strings.CONFIG_PATH, argument + ": true", true, true);
     }
 
@@ -444,5 +490,9 @@ public class Memory {
             return goLine(Strings.CONFIG_PATH, getLine(Strings.CONFIG_PATH, argument, true, false)).split(" ")[1];
 
         return null;
+    }
+
+    static boolean argumentEmpty(String argument) {
+        return argumentExist(argument) && !goLine(Strings.CONFIG_PATH, getLine(Strings.CONFIG_PATH, argument, true, false)).split(" ")[1].isEmpty();
     }
 }

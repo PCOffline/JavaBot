@@ -27,6 +27,6 @@ public class Prefix extends Command {
     @Override
     public void execute(MessageReceivedEvent event) {
         if (validate(event.getMessage().getContentRaw()))
-            Memory.editArgument(event.getGuild().getId(), "prefix", event.getMessage().getContentRaw().split(" ")[1], false);
+            Memory.editArgument("prefix", event.getMessage().getContentRaw().split(" ")[1], false);
     }
 }

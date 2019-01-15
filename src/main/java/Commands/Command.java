@@ -1,6 +1,7 @@
 package Commands;
 
 import Commands.Parameters.Parameter;
+import Main.Strings;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
@@ -68,9 +69,11 @@ public abstract class Command {
             return false;
         if ((!message.contains(" ")) && isParameter)
             return false;
+        if (!message.split("")[0].equals(Strings.prefix.getValue()))
+            return false;
         if (!isParameter)
-            return message.equalsIgnoreCase(this.name);
-        return message.split(" ")[0].equalsIgnoreCase(name) && (!message.split(" ")[1].isEmpty());
+            return message.equalsIgnoreCase(Strings.prefix.getValue() + this.name);
+        return message.split(" ")[0].equalsIgnoreCase(Strings.prefix.getValue() + name) && (!message.split(" ")[1].isEmpty());
     }
 
     public abstract void execute(MessageReceivedEvent event);

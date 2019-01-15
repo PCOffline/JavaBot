@@ -2,6 +2,7 @@ package Commands;
 
 import Commands.Parameters.Parameter;
 import Commands.Parameters.ParameterType;
+import Main.Strings;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class Cookie extends Command {
     public boolean validate(String message) {
         if (this.name == null || message == null)
             return false;
-        return message.split(" ")[0].equalsIgnoreCase(this.name);
+        return message.split(" ")[0].equalsIgnoreCase(Strings.prefix.getValue() + this.name);
     }
 
     @Override

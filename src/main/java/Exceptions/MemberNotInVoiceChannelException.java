@@ -7,6 +7,9 @@ import net.dv8tion.jda.core.entities.User;
  */
 
 public class MemberNotInVoiceChannelException extends RuntimeException {
+    public MemberNotInVoiceChannelException() {
+        super();
+    }
     public MemberNotInVoiceChannelException(String message) {
         super(message);
     }
