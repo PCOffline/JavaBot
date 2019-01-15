@@ -15,6 +15,7 @@ class Commands {
     private static Evil evil = new Evil();
     private static AutoMove autoMove = new AutoMove();
     private static Archive archive = new Archive();
+    private static Poop poop = new Poop();
 
     static void execute(MessageReceivedEvent event) {
         prefix.execute(event);
@@ -23,6 +24,6 @@ class Commands {
         evil.execute(event);
         autoMove.execute(event);
         archive.execute(event);
-
+        poop.execute(event);
     }
 }
