@@ -15,7 +15,7 @@ public class Strings {
     // GLOBAL VALUES
 
     static final String BOT_NAME = "Botato";
-    static final String token = "NTEwMDQ0MDQwMjMwNjAwNzA3.Dx9rYg.PNzfm0N3KvaCScPx8y3Vyi0INRQ";
+    static final String token = "*******";
     static final String CONFIG_PATH = "src/main/resources/Config.txt";
     // IMAGES
     static final String QUESTION_MARK = "https://www.kuleuven.be/studentenvoorzieningen/kot-leuven/icoontjes/question-mark-on-a-circular-black-background.png/image";
